@@ -140,13 +140,26 @@ class Welcome extends CI_Controller {
     }
 
     public function eliminarUsuario($id) {
-        $result['delete'] = $this->User_model->delete_user($id);
-
-        if ($result['delete']) {
-            $result['status'] = 'success';
+        $user = $this->User_model->get_user_by_id($id);
+    
+        if ($user) {
+            $imagePath = './uploads/' . $user->ImagenPerfil;
+            if (file_exists($imagePath) && !empty($user->ImagenPerfil)) {
+                unlink($imagePath);
+            }
+    
+            $result['delete'] = $this->User_model->delete_user($id);
+    
+            if ($result['delete']) {
+                $result['status'] = 'success';
+            } else {
+                $result['status'] = 'error';
+            }
         } else {
             $result['status'] = 'error';
+            $result['message'] = 'User not found';
         }
+    
         echo json_encode($result);
     }
 }
